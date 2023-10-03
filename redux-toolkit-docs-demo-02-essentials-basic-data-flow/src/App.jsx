@@ -8,13 +8,14 @@ import {
 import Navbar from "./layout/Navbar";
 import PostsList from "./features/posts/PostsList";
 import AddPostForm from "./features/posts/AddPostForm";
+import PostPage from "./features/posts/PostPage";
 import "./App.css";
 
 function App() {
   return (
     <Router>
       <Navbar />
-      
+
       <div className="App">
         <Routes>
           <Route
@@ -24,6 +25,12 @@ function App() {
                 <AddPostForm />
                 <PostsList />
               </>
+            }
+          />
+          <Route
+            path="/posts/:postId"
+            element={
+              <PostPage />
             }
           />
           <Route path="*" element={<Navigate to="/" />} />

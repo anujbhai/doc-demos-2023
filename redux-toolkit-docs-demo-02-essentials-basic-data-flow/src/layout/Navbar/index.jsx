@@ -1,3 +1,5 @@
+import { NavLink } from 'react-router-dom'
+
 const Navbar = () => {
   return (
     <nav>
@@ -5,7 +7,11 @@ const Navbar = () => {
         <h2>Redux essentials example.</h2>
 
         <div className="navContent">
-          <div className="navLinks"></div>
+          <div className="navLinks">
+            <NavLink to="/" className="active">
+              Posts
+            </NavLink>
+          </div>
         </div>
       </section>
     </nav>
