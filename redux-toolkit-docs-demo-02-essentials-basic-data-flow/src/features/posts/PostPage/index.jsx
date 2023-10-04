@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux'
-import {useParams} from 'react-router-dom'
+import {NavLink, useParams} from 'react-router-dom'
 
 const PostPage = () => {
   const { postId } = useParams()
@@ -14,6 +14,8 @@ const PostPage = () => {
         <h2>{post.title}</h2>
 
         <p className="post-content">{post.content}</p>
+
+        <NavLink to={`/editPosts/${post.id}`} className="button">Edit post</NavLink>
       </article>
     </section>
   )
