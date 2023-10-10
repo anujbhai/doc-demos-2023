@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { reactionAdded } from "../postsSlice";
 
 const reactionEmoji = {
-  thumbsup: "👍",
+  thumbsUp: "👍",
   hooray: "🎉",
   heart: "❤️",
   rocket: "🚀",
@@ -23,8 +23,7 @@ const ReactionButtons = (props) => {
         className="muted-button reaction-button"
         onClick={() =>
           dispatch(reactionAdded({
-            type: "posts/reactionAdded",
-            payload: { postId: post.id, reaction: name },
+            postId: post.id, reaction: name
           }))
         }
       >
