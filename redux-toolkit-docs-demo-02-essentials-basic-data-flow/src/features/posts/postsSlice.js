@@ -1,11 +1,18 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 // import { sub } from "date-fns";
+
+import { client } from '../../api/client';
 
 const initialState = {
   posts: [],
   status: 'idle',
   error: null
 };
+
+export const fetchPosts = createAsyncThunk('posts/fetchPosts', async () => {
+  const response = await client.get('/fakeApi/posts');
+  return response.data;
+})
 
 /* const postsSlice = createSlice({
   name: "posts",
@@ -63,7 +70,7 @@ const postsSlice = createSlice({
         state.posts.push(action.payload);
       },
       // eslint-disable-next-line no-unused-vars
-      prepare(title, content, userId) {}
+      prepare(title, content, userId) { }
     },
     reactionAdded(state, action) {
       const { postId, reaction } = action.payload;

@@ -125,7 +125,7 @@ const serializePost = (post) => ({
 export const handlers = [
   rest.get('/fakeApi/posts', (_, res, ctx) => {
     const posts = db.post.getAll().map(serializePost)
-    return res(ctx.delay(DELAY_MS), ctx.json({ posts }))
+    return res(ctx.delay(DELAY_MS), ctx.json(posts))
   }),
   rest.post('/fakeApi/posts', (req, res, ctx) => {
     const data = req.json()
