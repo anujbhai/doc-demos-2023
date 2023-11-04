@@ -1,4 +1,4 @@
-import { rest, setupWorker } from 'msw'
+import { http, setupWorker } from 'msw'
 import { factory, primaryKey, manyOf, oneOf } from '@mswjs/data'
 import { faker } from '@faker-js/faker'
 import { nanoid } from '@reduxjs/toolkit'
@@ -45,7 +45,8 @@ function getRandomInt(min, max) {
 }
 
 function randomFromArray(arr) {
-  return arr[getRandomInt(0, arr.length - 1)]
+  const index = getRandomInt(0, arr.length - 1)
+  return arr[index]
 }
 
 /* MSW data model setup */
@@ -123,11 +124,12 @@ const serializePost = (post) => ({
 
 /* MSW REST API HANDLERS */
 export const handlers = [
-  rest.get('/fakeApi/posts', (_, res, ctx) => {
+  // eslint-disable-next-line no-unused-vars
+  http.get('/fakeApi/posts', (req, res, ctx) => {
     const posts = db.post.getAll().map(serializePost)
     return res(ctx.delay(DELAY_MS), ctx.json(posts))
   }),
-  rest.post('/fakeApi/posts', (req, res, ctx) => {
+  http.post('/fakeApi/posts', (req, res, ctx) => {
     const data = req.json()
 
     if (data.content === 'error') {
@@ -147,12 +149,12 @@ export const handlers = [
     const post = db.post.create(data)
     return res(ctx.delay(DELAY_MS), ctx.json({ post: serializePost(post) }))
   }),
-  rest.get('/fakeApi/posts/:id', (req, res, ctx) => {
+  http.get('/fakeApi/posts/:id', (req, res, ctx) => {
     const post = db.post.findFirst({ where: { id: { equals: req.params.id } }, })
 
     return res(ctx.delay(DELAY_MS), ctx.json({ post: serializePost(post) }))
   }),
-  rest.patch('/fakeApi/posts/:id', (req, res, ctx) => {
+  http.patch('/fakeApi/posts/:id', (req, res, ctx) => {
     // eslint-disable-next-line no-unused-vars
     const { id, ...data } = req.json()
     const updatedPost = db.post.update({
@@ -162,7 +164,7 @@ export const handlers = [
 
     return res(ctx.delay(DELAY_MS), ctx.json({ post: serializePost(updatedPost) }))
   }),
-  rest.get('/fakeApi/posts/:id/comments', (req, res, ctx) => {
+  http.get('/fakeApi/posts/:id/comments', (req, res, ctx) => {
     const post = db.post.findFirst({
       where: { id: { equals: req.params.id } },
     })
@@ -172,7 +174,7 @@ export const handlers = [
       ctx.json({ comments: post.comments })
     )
   }),
-  rest.post('/fakeApi/posts/:id/reactions', (req, res, ctx) => {
+  http.post('/fakeApi/posts/:id/reactions', (req, res, ctx) => {
     const postId = req.params.id
     const reaction = req.json().then((reaction) => reaction.reaction)
     const post = db.post.findFirst({ where: { id: { equals: postId } }, })
@@ -188,7 +190,7 @@ export const handlers = [
 
     return res(ctx.delay(DELAY_MS), ctx.json({ post: serializePost(updatedPost) }))
   }),
-  rest.get('/fakeApi/notifications', (_, res, ctx) => {
+  http.get('/fakeApi/notifications', (_, res, ctx) => {
     const numNotifications = getRandomInt(1, 5)
 
     let notifications = generateRandomNotifications(
@@ -199,14 +201,14 @@ export const handlers = [
 
     return res(ctx.delay(DELAY_MS), ctx.json({ notifications }))
   }),
-  rest.get('/fakeApi/users', (_, res, ctx) => {
+  http.get('/fakeApi/users', (_, res, ctx) => {
     return res(ctx.delay(DELAY_MS), ctx.json(db.user.getAll()))
   })
 ]
 
 export const worker = setupWorker(...handlers)
 
-const socketServer = new MockSocketServer('ws://localhost:3000')
+const socketServer = new MockSocketServer('ws://localhost')
 
 let currentSocket
 
