@@ -1,10 +1,10 @@
-import { http, setupWorker } from 'msw'
+import { rest, setupWorker } from 'msw'
 import { factory, primaryKey, manyOf, oneOf } from '@mswjs/data'
 import { faker } from '@faker-js/faker'
 import { nanoid } from '@reduxjs/toolkit'
 import { Server as MockSocketServer } from 'mock-socket'
 import { setRandom } from 'txtgen'
-import seedRandom from 'seed-random'
+import seedrandom from 'seedrandom'
 import { parseISO } from 'date-fns'
 
 const NUM_USERS = 3
@@ -19,7 +19,7 @@ const DELAY_MS = 2000
 // This can be reset by deleting this localStorage value,
 // or turned off by setting `useSeededRNG` to false.
 let useSeededRNG = true
-let rng = seedRandom()
+let rng = seedrandom()
 
 if (useSeededRNG) {
   let randomSeedStr = localStorage.getItem('randomTimestampSeed')
@@ -33,7 +33,7 @@ if (useSeededRNG) {
     localStorage.setItem('randomTimestampSeed', randomSeedStr)
   }
 
-  rng = seedRandom(randomSeedStr)
+  rng = seedrandom(randomSeedStr)
   setRandom(rng)
   faker.seed(seedDate.getTime())
 }
@@ -125,11 +125,11 @@ const serializePost = (post) => ({
 /* MSW REST API HANDLERS */
 export const handlers = [
   // eslint-disable-next-line no-unused-vars
-  http.get('/fakeApi/posts', (req, res, ctx) => {
+  rest.get('/fakeApi/posts', (req, res, ctx) => {
     const posts = db.post.getAll().map(serializePost)
     return res(ctx.delay(DELAY_MS), ctx.json(posts))
   }),
-  http.post('/fakeApi/posts', (req, res, ctx) => {
+  rest.post('/fakeApi/posts', (req, res, ctx) => {
     const data = req.json()
 
     if (data.content === 'error') {
@@ -149,12 +149,12 @@ export const handlers = [
     const post = db.post.create(data)
     return res(ctx.delay(DELAY_MS), ctx.json({ post: serializePost(post) }))
   }),
-  http.get('/fakeApi/posts/:id', (req, res, ctx) => {
+  rest.get('/fakeApi/posts/:id', (req, res, ctx) => {
     const post = db.post.findFirst({ where: { id: { equals: req.params.id } }, })
 
     return res(ctx.delay(DELAY_MS), ctx.json({ post: serializePost(post) }))
   }),
-  http.patch('/fakeApi/posts/:id', (req, res, ctx) => {
+  rest.patch('/fakeApi/posts/:id', (req, res, ctx) => {
     // eslint-disable-next-line no-unused-vars
     const { id, ...data } = req.json()
     const updatedPost = db.post.update({
@@ -164,7 +164,7 @@ export const handlers = [
 
     return res(ctx.delay(DELAY_MS), ctx.json({ post: serializePost(updatedPost) }))
   }),
-  http.get('/fakeApi/posts/:id/comments', (req, res, ctx) => {
+  rest.get('/fakeApi/posts/:id/comments', (req, res, ctx) => {
     const post = db.post.findFirst({
       where: { id: { equals: req.params.id } },
     })
@@ -174,7 +174,7 @@ export const handlers = [
       ctx.json({ comments: post.comments })
     )
   }),
-  http.post('/fakeApi/posts/:id/reactions', (req, res, ctx) => {
+  rest.post('/fakeApi/posts/:id/reactions', (req, res, ctx) => {
     const postId = req.params.id
     const reaction = req.json().then((reaction) => reaction.reaction)
     const post = db.post.findFirst({ where: { id: { equals: postId } }, })
@@ -190,7 +190,7 @@ export const handlers = [
 
     return res(ctx.delay(DELAY_MS), ctx.json({ post: serializePost(updatedPost) }))
   }),
-  http.get('/fakeApi/notifications', (_, res, ctx) => {
+  rest.get('/fakeApi/notifications', (_, res, ctx) => {
     const numNotifications = getRandomInt(1, 5)
 
     let notifications = generateRandomNotifications(
@@ -201,7 +201,7 @@ export const handlers = [
 
     return res(ctx.delay(DELAY_MS), ctx.json({ notifications }))
   }),
-  http.get('/fakeApi/users', (_, res, ctx) => {
+  rest.get('/fakeApi/users', (_, res, ctx) => {
     return res(ctx.delay(DELAY_MS), ctx.json(db.user.getAll()))
   })
 ]
