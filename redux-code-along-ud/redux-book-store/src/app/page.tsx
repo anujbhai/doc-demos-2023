@@ -7,26 +7,39 @@ import styles from './page.module.css'
 export default function Home() {
   const [bookTitle, setBookTitle] = useState('')
   const dispatch = useDispatch()
-  const books = useSelector(state => state.books)
-  const basket = useSelector(state => state.basket)
-  const likedBooks = useSelector(state => state.likedBooks)
+  const books = useSelector((state: {
+    books: {
+      title: string,
+      inBasket: boolean,
+      liked: boolean,
+    }[]
+  }) => state.books)
+  const basket = useSelector((state: { basket: string[] }) => state.basket)
+  const likedBooks = useSelector((state: {
+    likedBooks: string[]
+  }) => state.likedBooks)
 
   const handleAddBook = () => {
-    dispatch({type: 'ADD_BOOK', payload: bookTitle})
+    const newBook = {
+      title: bookTitle,
+      inBasket: false,
+      liked: false,
+    }
+
+    dispatch({ type: 'ADD_BOOK', payload: newBook })
     setBookTitle('')
   }
 
-  const handleAddToBasket = (book) => {
-    dispatch({type: 'ADD_TO_BASKET', payload: book})
+  const handleAddToBasket = (book: string) => {
+    dispatch({ type: 'ADD_TO_BASKET', payload: book })
   }
 
-  const handleAddToLiked = (book) => {
-    dispatch({type: 'ADD_TO_LIKED', payload: book})
+  const handleAddToLiked = (book: string) => {
+    dispatch({ type: 'ADD_TO_LIKED', payload: book })
   }
 
   return (
-    <>
-      {console.log('bookTitle:', bookTitle)}
+    <div className="container">
       <div>
         <h1>My Book List</h1>
       </div>
@@ -47,11 +60,19 @@ export default function Home() {
         <ul>
           {books.map((book, index: string | number) => (
             <li key={index}>
-              <p>{book}</p>
+              <p>{book.title}</p>
 
               <div>
-                <button onClick={() => handleAddToBasket(book)}>Add to basket</button>
-                <button onClick={() => handleAddToLiked(book)}>Add to liked</button>
+                <button onClick={() => handleAddToBasket(book.title)}>{
+                  !book.inBasket
+                    ? 'Add to Basket'
+                    : 'In Basket'
+                }</button>
+                <button onClick={() => handleAddToLiked(book.title)}>{
+                  !book.liked
+                    ? 'Add to Liked'
+                    : 'Liked'
+                }</button>
               </div>
             </li>
           ))}
@@ -65,7 +86,7 @@ export default function Home() {
             </li>
           ))}
         </ul>
-        
+
         <h2>Liked Books ({likedBooks.length})</h2>
         <ul>
           {likedBooks.map((item, index: string | number) => (
@@ -75,6 +96,6 @@ export default function Home() {
           ))}
         </ul>
       </div>
-    </>
+    </div>
   )
 }
