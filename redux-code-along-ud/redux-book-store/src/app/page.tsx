@@ -1,6 +1,19 @@
 'use client'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import {
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  Typography,
+} from '@mui/material'
+import {
+  AddShoppingCart,
+  Favorite,
+  FavoriteBorder,
+  RemoveShoppingCart,
+} from '@mui/icons-material'
 
 import styles from './page.module.css'
 
@@ -44,7 +57,7 @@ export default function Home() {
         <h1>My Book List</h1>
       </div>
 
-      <div>
+      <div className="add-book">
         <input
           type="text"
           placeholder="Enter a book title.."
@@ -57,24 +70,30 @@ export default function Home() {
 
       <div>
         <h2>My Books</h2>
-        <ul>
+        <ul className="book-list">
           {books.map((book, index: string | number) => (
-            <li key={index}>
-              <p>{book.title}</p>
+            <Card key={index} className="book-card">
+              <CardContent>
+                <Typography variant="h5" component="h2">{book.title}</Typography>
+              </CardContent>
 
-              <div>
-                <button onClick={() => handleAddToBasket(book.title)}>{
-                  !book.inBasket
-                    ? 'Add to Basket'
-                    : 'In Basket'
-                }</button>
-                <button onClick={() => handleAddToLiked(book.title)}>{
-                  !book.liked
-                    ? 'Add to Liked'
-                    : 'Liked'
-                }</button>
-              </div>
-            </li>
+              <CardActions>
+                <Button
+                  startIcon={book.inBasket ? <RemoveShoppingCart /> : <AddShoppingCart />}
+                  onClick={() => handleAddToBasket(book.title)}
+                >{!book.inBasket
+                  ? 'Add'
+                  : 'Remove'
+                }</Button>
+                <Button
+                  startIcon={book.liked ? <Favorite /> : <FavoriteBorder />}
+                  onClick={() => handleAddToLiked(book.title)}
+                >{!book.liked
+                  ? 'Like'
+                  : 'Liked'
+                }</Button>
+              </CardActions>
+            </Card>
           ))}
         </ul>
 
