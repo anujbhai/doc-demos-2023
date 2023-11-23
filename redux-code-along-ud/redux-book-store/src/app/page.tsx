@@ -1,37 +1,70 @@
 'use client'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import {
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  Typography,
+} from '@mui/material'
+import {
+  AddShoppingCart,
+  Favorite,
+  FavoriteBorder,
+  RemoveShoppingCart,
+} from '@mui/icons-material'
 
 import styles from './page.module.css'
+import {
+  addBook,
+  addToBasket,
+  addToLikedBooks,
+} from "../../store";
+
+interface RootState {
+  books: {
+    title: string
+    inBasket: boolean
+    liked: boolean
+  }[]
+  basket: string[]
+  likedBooks: string[]
+}
 
 export default function Home() {
   const [bookTitle, setBookTitle] = useState('')
   const dispatch = useDispatch()
-  const books = useSelector(state => state.books)
-  const basket = useSelector(state => state.basket)
-  const likedBooks = useSelector(state => state.likedBooks)
+  const books = useSelector((state: RootState) => state.books)
+  const basket = useSelector((state: RootState) => state.basket)
+  const likedBooks = useSelector((state: RootState) => state.likedBooks)
 
   const handleAddBook = () => {
-    dispatch({type: 'ADD_BOOK', payload: bookTitle})
+    const newBook = {
+      title: bookTitle,
+      inBasket: false,
+      liked: false,
+    }
+
+    dispatch(addBook(newBook))
     setBookTitle('')
   }
 
-  const handleAddToBasket = (book) => {
-    dispatch({type: 'ADD_TO_BASKET', payload: book})
+  const handleAddToBasket = (book: string) => {
+    dispatch(addToBasket(book))
   }
 
-  const handleAddToLiked = (book) => {
-    dispatch({type: 'ADD_TO_LIKED', payload: book})
+  const handleAddToLiked = (book: string) => {
+    dispatch(addToLikedBooks(book))
   }
 
   return (
-    <>
-      {console.log('bookTitle:', bookTitle)}
+    <div className="container">
       <div>
         <h1>My Book List</h1>
       </div>
 
-      <div>
+      <div className="add-book">
         <input
           type="text"
           placeholder="Enter a book title.."
@@ -44,16 +77,30 @@ export default function Home() {
 
       <div>
         <h2>My Books</h2>
-        <ul>
+        <ul className="book-list">
           {books.map((book, index: string | number) => (
-            <li key={index}>
-              <p>{book}</p>
+            <Card key={index} className="book-card">
+              <CardContent>
+                <Typography variant="h5" component="h2">{book.title}</Typography>
+              </CardContent>
 
-              <div>
-                <button onClick={() => handleAddToBasket(book)}>Add to basket</button>
-                <button onClick={() => handleAddToLiked(book)}>Add to liked</button>
-              </div>
-            </li>
+              <CardActions>
+                <Button
+                  startIcon={book.inBasket ? <RemoveShoppingCart /> : <AddShoppingCart />}
+                  onClick={() => handleAddToBasket(book.title)}
+                >{!book.inBasket
+                  ? 'Add'
+                  : 'Remove'
+                }</Button>
+                <Button
+                  startIcon={book.liked ? <Favorite /> : <FavoriteBorder />}
+                  onClick={() => handleAddToLiked(book.title)}
+                >{!book.liked
+                  ? 'Like'
+                  : 'Liked'
+                }</Button>
+              </CardActions>
+            </Card>
           ))}
         </ul>
 
@@ -65,7 +112,7 @@ export default function Home() {
             </li>
           ))}
         </ul>
-        
+
         <h2>Liked Books ({likedBooks.length})</h2>
         <ul>
           {likedBooks.map((item, index: string | number) => (
@@ -75,6 +122,6 @@ export default function Home() {
           ))}
         </ul>
       </div>
-    </>
+    </div>
   )
 }
