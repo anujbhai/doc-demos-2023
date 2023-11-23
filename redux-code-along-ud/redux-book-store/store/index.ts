@@ -1,22 +1,22 @@
-import { createStore } from 'redux'
+import {
+  configureStore,
+  createSlice,
+  PayloadAction,
+} from '@reduxjs/toolkit'
 
-type Book = {
+interface Book {
   title: string,
   inBasket: boolean,
   liked: boolean,
 }
 
-type State = {
+interface BookState {
   books: Book[],
   basket: string[],
   likedBooks: string[],
 }
 
-type Action = {type: 'ADD_BOOK', payload: Book}
-  | {type: 'ADD_TO_BASKET', payload: string}
-  | {type: 'ADD_TO_LIKED', payload: string}
-
-const initialState = {
+const initialState: BookState = {
   books: [
     { title: 'Rich Dad, Poor Dad', inBasket: false, liked: false },
     { title: 'Atomic Habits', inBasket: false, liked: false },
@@ -27,44 +27,49 @@ const initialState = {
   likedBooks: []
 }
 
-function reducer(state: State = initialState, action: Action): State {
-  switch (action.type) {
-    case 'ADD_BOOK':
-      return { ...state, books: [...state.books, action.payload] }
-    case 'ADD_TO_BASKET':
-      return {
-        ...state,
-        books: state.books.map(
-          book => book.title === action.payload
-          ? { ...book, inBasket: !book.inBasket }
-          : book
-        ),
-        basket: state.basket.includes(action.payload)
-          ? state.basket.filter(book => book !== action.payload)
-          : [...state.basket, action.payload]
-      }
-    case 'ADD_TO_LIKED':
-      return {
-        ...state,
-        books: state.books.map(
-          book => book.title === action.payload
-          ? { ...book, liked: !book.liked }
-          : book
-        ),
-        likedBooks: state.likedBooks.includes(action.payload)
-          ? state.likedBooks.filter(book => book !== action.payload)
-          : [...state.likedBooks, action.payload]
-      }
-    // case 'REMOVE_FROM_BASKET':
-    //   return { ...state, basket: state.basket.filter(book => book.id !== action.payload) }
-    // case 'REMOVE_FROM_LIKED':
-    //   return { ...state, likedBooks: state.likedBooks.filter(book => book.id !== action.payload) }
-    default:
-      return state
-  }
-}
+const bookSlice = createSlice({
+  name: 'books',
+  initialState,
+  reducers: {
+    addBook: (state, action: PayloadAction<Book>) => {
+      state.books.push(action.payload)
+    },
+    addToBasket: (state, action: PayloadAction<String>) => {
+      state.books = state.books.map(book => {
+        if (book.title === action.payload) {
+          return {...book, inBasket: !book.inBasket}
+        }
 
-const store = createStore(reducer, initialState)
+        return book
+      })
+
+      if (state.basket.includes(action.payload)) {
+        state.basket = state.basket.filter(movie => movie !== action.payload)
+      } else {
+        state.basket.push(action.payload)
+      }
+    },
+    addToLikedBooks: (state, action: PayloadAction<string>) => {
+      state.books = state.books.map(book => {
+        if (book.title === action.payload) {
+          return {...book, liked: !book.liked}
+        }
+
+        return book
+      })
+
+      if (state.likedBooks.includes(action.payload)) {
+        state.likedBooks = state.likedBooks.filter(book => book !== action.payload)
+      } else {
+        state.likedBooks.push(action.payload)
+      }
+    }
+  }
+})
+
+const store = configureStore({ reducer: bookSlice.reducer })
+
+export const {addBook, addToBasket, addToLikedBooks} = bookSlice.actions
 
 export default store
 

@@ -16,21 +16,28 @@ import {
 } from '@mui/icons-material'
 
 import styles from './page.module.css'
+import {
+  addBook,
+  addToBasket,
+  addToLikedBooks,
+} from "../../store";
+
+interface RootState {
+  books: {
+    title: string
+    inBasket: boolean
+    liked: boolean
+  }[]
+  basket: string[]
+  likedBooks: string[]
+}
 
 export default function Home() {
   const [bookTitle, setBookTitle] = useState('')
   const dispatch = useDispatch()
-  const books = useSelector((state: {
-    books: {
-      title: string,
-      inBasket: boolean,
-      liked: boolean,
-    }[]
-  }) => state.books)
-  const basket = useSelector((state: { basket: string[] }) => state.basket)
-  const likedBooks = useSelector((state: {
-    likedBooks: string[]
-  }) => state.likedBooks)
+  const books = useSelector((state: RootState) => state.books)
+  const basket = useSelector((state: RootState) => state.basket)
+  const likedBooks = useSelector((state: RootState) => state.likedBooks)
 
   const handleAddBook = () => {
     const newBook = {
@@ -39,16 +46,16 @@ export default function Home() {
       liked: false,
     }
 
-    dispatch({ type: 'ADD_BOOK', payload: newBook })
+    dispatch(addBook(newBook))
     setBookTitle('')
   }
 
   const handleAddToBasket = (book: string) => {
-    dispatch({ type: 'ADD_TO_BASKET', payload: book })
+    dispatch(addToBasket(book))
   }
 
   const handleAddToLiked = (book: string) => {
-    dispatch({ type: 'ADD_TO_LIKED', payload: book })
+    dispatch(addToLikedBooks(book))
   }
 
   return (
