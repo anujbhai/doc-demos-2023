@@ -122,6 +122,13 @@ section h1 {
   margin-top: 0.5rem;
 }
 
+.post-list-item-footer {
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
 .posts-container.disabled {
   opacity: 0.5;
 }
