@@ -1,6 +1,10 @@
 import { useSelector } from "react-redux"
 import { NavLink, useParams } from "react-router-dom"
 
+import PostAuthor from "../PostAuthor"
+import TimeAgo from "../TimeAgo"
+import ReactionButtons from "../ReactionButtons"
+
 const SinglePostPage = () => {
   const { postId } = useParams()
 
@@ -21,8 +25,18 @@ const SinglePostPage = () => {
 
         <p className="post-content">{ post.content }</p>
 
+        <ReactionButtons post={ post } />
+
+        <blockquote>
+          <PostAuthor userId={ post.user } />
+        </blockquote>
+
+        <p>
+          <TimeAgo timestamp={ post.date } />
+        </p>
+
         <NavLink
-          to={ `/editPost/${post.id}` }
+          to={ `/editPost/${ post.id }` }
           className='button'
         >Edit</NavLink>
       </article>
