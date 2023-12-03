@@ -1,14 +1,15 @@
-import { useSelector } from "react-redux"
-import { NavLink, useParams } from "react-router-dom"
+import { useSelector } from 'react-redux'
+import { NavLink, useParams } from 'react-router-dom'
 
-import PostAuthor from "../PostAuthor"
-import TimeAgo from "../TimeAgo"
-import ReactionButtons from "../ReactionButtons"
+import PostAuthor from '../PostAuthor'
+import TimeAgo from '../TimeAgo'
+import ReactionButtons from '../ReactionButtons'
+import { selectPostById } from '../postsSlice'
 
 const SinglePostPage = () => {
   const { postId } = useParams()
 
-  const post = useSelector(state => state.posts.find(post => post.id === postId))
+  const post = useSelector((state) => selectPostById(state, postId))
 
   if (!post) {
     return (
@@ -21,28 +22,26 @@ const SinglePostPage = () => {
   return (
     <section>
       <article className="post">
-        <h2>{ post.title }</h2>
+        <h2>{post.title}</h2>
 
-        <p className="post-content">{ post.content }</p>
+        <p className="post-content">{post.content}</p>
 
-        <ReactionButtons post={ post } />
+        <ReactionButtons post={post} />
 
         <blockquote>
-          <PostAuthor userId={ post.user } />
+          <PostAuthor userId={post.user} />
         </blockquote>
 
         <p>
-          <TimeAgo timestamp={ post.date } />
+          <TimeAgo timestamp={post.date} />
         </p>
 
-        <NavLink
-          to={ `/editPost/${ post.id }` }
-          className='button'
-        >Edit</NavLink>
+        <NavLink to={`/editPost/${post.id}`} className="button">
+          Edit
+        </NavLink>
       </article>
     </section>
   )
 }
 
 export default SinglePostPage
-

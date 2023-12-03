@@ -1,12 +1,12 @@
-import { useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
-import { useNavigate, useParams } from "react-router-dom"
+import { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate, useParams } from 'react-router-dom'
 
-import { postUpdated } from "../postsSlice"
+import { postUpdated, selectPostById } from '../postsSlice'
 
 const EditPostForm = () => {
   const { postId } = useParams()
-  const post = useSelector(state => state.posts.find(post => post.id === postId))
+  const post = useSelector((state) => selectPostById(state, postId))
   const [title, setTitle] = useState(post.title)
   const [content, setContent] = useState(post.content)
   const dispatch = useDispatch()
@@ -25,7 +25,7 @@ const EditPostForm = () => {
         })
       )
 
-      navigate(`/posts/${postId}`) 
+      navigate(`/posts/${postId}`)
     }
   }
 
@@ -51,14 +51,12 @@ const EditPostForm = () => {
           onChange={handleContentChange}
         />
 
-        <button
-          type="button"
-          onClick={handleSavePostClicked}
-        >Save</button>
+        <button type="button" onClick={handleSavePostClicked}>
+          Save
+        </button>
       </form>
     </section>
   )
 }
 
 export default EditPostForm
-
