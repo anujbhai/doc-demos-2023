@@ -1,35 +1,49 @@
-import { useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
+import { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { postAdded } from "../postsSlice"
+import { addNewPost, postAdded } from '../postsSlice'
 
 const AddPostForm = () => {
   // states
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [userId, setUserId] = useState('')
+  const [addRequestStatus, setAddRequestStatus] = useState('idle')
 
   // dispatch and selector
   const dispatch = useDispatch()
-  const users = useSelector(state => state.users)
+  const users = useSelector((state) => state.users)
 
   // events
   const handleTitleChange = (e) => setTitle(e.target.value)
   const handleContentChange = (e) => setContent(e.target.value)
   const handleAuthorChange = (e) => setUserId(e.target.value)
-  const handleSavePostClicked = () => {
-    if (title && content) {
-      dispatch(postAdded(title, content, userId))
+
+  const canSave =
+    [title, content, userId].every(Boolean) && addRequestStatus === 'idle'
+  const handleSavePostClicked = async () => {
+    if (canSave) {
+      try {
+        setAddRequestStatus('pending')
+        await dispatch(addNewPost({ title, content, user: userId }))
+        setTitle('')
+        setContent('')
+        setUserId('')
+      } catch (err) {
+        console.error('Failed to save the post: ', err)
+      } finally {
+        setAddRequestStatus('idle')
+      }
 
       setTitle('')
       setContent('')
     }
   }
 
-  const canSave = Boolean(title) && Boolean(content) && Boolean(userId)
-
-  const usersOptions = users.map(user => (
-    <option key={user.id} value={user.id}>{ user.name }</option>
+  const usersOptions = users.map((user) => (
+    <option key={user.id} value={user.id}>
+      {user.name}
+    </option>
   ))
 
   return (
@@ -55,24 +69,21 @@ const AddPostForm = () => {
         />
 
         <label htmlFor="postAuthor">Author:</label>
-        <select
-          id="postAuthor"
-          value={ userId }
-          onChange={ handleAuthorChange }
-        >
+        <select id="postAuthor" value={userId} onChange={handleAuthorChange}>
           <option value="">-- SELECT --</option>
-          { usersOptions }
+          {usersOptions}
         </select>
 
         <button
           type="button"
           onClick={handleSavePostClicked}
-          disabled={ !canSave }
-        >Save</button>
+          disabled={!canSave}
+        >
+          Save
+        </button>
       </form>
     </section>
   )
 }
 
 export default AddPostForm
-
