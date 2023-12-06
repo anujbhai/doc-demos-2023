@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { addNewPost, postAdded } from '../postsSlice'
+import { addNewPost } from '../postsSlice'
+import { selectAllUsers } from '../../users/usersSlice'
 
 const AddPostForm = () => {
   // states
@@ -12,7 +13,7 @@ const AddPostForm = () => {
 
   // dispatch and selector
   const dispatch = useDispatch()
-  const users = useSelector((state) => state.users)
+  const users = useSelector(selectAllUsers)
 
   // events
   const handleTitleChange = (e) => setTitle(e.target.value)
