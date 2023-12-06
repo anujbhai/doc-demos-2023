@@ -6,7 +6,7 @@ import PostAuthor from '../PostAuthor'
 import TimeAgo from '../TimeAgo'
 import ReactionButtons from '../ReactionButtons'
 import Spinner from '../../../components/Spinner'
-import { fetchPosts, selectAllPosts, selectPostById, selectPostIds } from '../postsSlice'
+import { fetchPosts, selectPostById, selectPostIds } from '../postsSlice'
 
 let PostExcerpt = ({ postId }) => {
   const post = useSelector(state => selectPostById(state, postId))
@@ -30,7 +30,7 @@ PostExcerpt = memo(PostExcerpt)
 
 const PostsList = () => {
   const dispatch = useDispatch()
-  const posts = useSelector(selectAllPosts)
+  // const posts = useSelector(selectAllPosts)
   const orderedPosts = useSelector(selectPostIds)
 
   const postStatus = useSelector((state) => state.posts.status)

@@ -7,9 +7,8 @@ import { selectPostByUser } from "../../posts/postsSlice"
 const SingleUserPage = () => {
   const {userId} = useParams()
   const user = useSelector(state => selectUserById(state, userId))
-  const postsForUser = useSelector(state => {
-    selectPostByUser(state, userId)
-  })
+  const postsForUser = useSelector(state => selectPostByUser(state, userId))
+  console.log('Posts for user:', postsForUser)
   const postTitles = postsForUser.map(post => (
     <li key={post.id}>
       <NavLink to={`/posts/${post.id}`}>
