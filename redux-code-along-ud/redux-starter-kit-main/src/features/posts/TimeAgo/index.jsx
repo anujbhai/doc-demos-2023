@@ -1,6 +1,6 @@
-import { formatDistanceToNow, parseISO } from "date-fns"
+import { formatDistanceToNow, parseISO } from 'date-fns'
 
-const TimeAgo = props => {
+const TimeAgo = (props) => {
   const { timestamp } = props
 
   let timeago = ''
@@ -9,15 +9,14 @@ const TimeAgo = props => {
     const date = parseISO(timestamp)
     const timeperiod = formatDistanceToNow(date)
 
-    timeago = ` ${ timeperiod } ago`
+    timeago = ` ${timeperiod} ago`
   }
 
   return (
     <span title={timestamp}>
-      <i>{ timeago }</i>
+      <i>{timeago}</i>
     </span>
   )
 }
 
 export default TimeAgo
-
