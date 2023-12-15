@@ -1,42 +1,52 @@
-import { createAsyncThunk, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import { client } from "../../api/client";
+import {
+  createAsyncThunk,
+  createEntityAdapter,
+  createSlice,
+} from '@reduxjs/toolkit'
+import client from '../../api/client'
 
 const notificationsAdapter = createEntityAdapter({
-  sortComparer: (a, b) => b.date.localeCompare(a.date)
+  sortComparer: (a, b) => b.date.localeCompare(a.date),
 })
 
-export const fetchNotifications = createAsyncThunk('notifications/fetchNotifications', async (_, {getState}) => {
-  const allNotifications = selectAllNotifications(getState())
-  const {latestNotification} = allNotifications
-  const latestTimestamp = latestNotification ? latestNotification.date : ''
-  const response = await client.get(`/fakeApi/notifications?since=${latestTimestamp}`)
+export const fetchNotifications = createAsyncThunk(
+  'notifications/fetchNotifications',
+  async (_, { getState }) => {
+    const allNotifications = selectAllNotifications(getState())
+    const { latestNotification } = allNotifications
+    const latestTimestamp = latestNotification ? latestNotification.date : ''
+    const response = await client.get(
+      `/fakeApi/notifications?since=${latestTimestamp}`,
+    )
 
-  console.log('data:', response.data)
-  return response.data
-})
+    // console.log('data:', response.data)
+    return response.data
+  },
+)
 
 const notificationsSlice = createSlice({
   name: 'notifications',
   initialState: notificationsAdapter.getInitialState(),
   reducers: {
+    // eslint-disable-next-line
     allNotificationsRead(state, action) {
-      Object.values(state.entities).forEach(notification => {
+      Object.values(state.entities).forEach((notification) => {
         notification.read = true
       })
-    }
+    },
   },
   extraReducers(builder) {
-    builder.addCase(
-      fetchNotifications.fulfilled,
-      (state, action) => {
-        notificationsAdapter.upsertMany(state.payload)
-        Object.values(state.entities).forEach(notification => notification.isNew = !notification.read)
-      }
-    )
-  }
+    // eslint-disable-next-line
+    builder.addCase(fetchNotifications.fulfilled, (state, action) => {
+      notificationsAdapter.upsertMany(state.payload)
+      Object.values(state.entities).forEach((notification) => {
+        notification.isNew = !notification.read
+      })
+    })
+  },
 })
 
-export const {allNotificationsRead} = notificationsSlice.actions
+export const { allNotificationsRead } = notificationsSlice.actions
 export default notificationsSlice.reducer
-export const {selectAll: selectAllNotifications} = notificationsAdapter.getSelectors(state => state.notifications)
-
+export const { selectAll: selectAllNotifications } =
+  notificationsAdapter.getSelectors((state) => state.notifications)
