@@ -1,11 +1,10 @@
 import { rest, setupWorker } from 'msw'
-import { factory, oneOf, manyOf, primaryKey } from '@mswjs/data'
+import { factory, oneOf, manyOf, primaryKey } from '@mswjs/data' // eslint-disable-line
 import { nanoid } from '@reduxjs/toolkit'
 import faker from 'faker'
 import seedrandom from 'seedrandom'
 import { Server as MockSocketServer } from 'mock-socket'
 import { setRandom } from 'txtgen'
-
 import { parseISO } from 'date-fns'
 
 const NUM_USERS = 3
@@ -21,7 +20,7 @@ const ARTIFICIAL_DELAY_MS = 2000
 // a consistent set of users / entries each time the page loads.
 // This can be reset by deleting this localStorage value,
 // or turned off by setting `useSeededRNG` to false.
-let useSeededRNG = true
+const useSeededRNG = true
 
 let rng = seedrandom()
 
@@ -43,9 +42,12 @@ if (useSeededRNG) {
 }
 
 function getRandomInt(min, max) {
-  min = Math.ceil(min)
-  max = Math.floor(max)
-  return Math.floor(rng() * (max - min + 1)) + min
+  let minVal = min
+  let maxVal = max
+
+  minVal = Math.ceil(minVal)
+  maxVal = Math.floor(maxVal)
+  return Math.floor(rng() * (maxVal - minVal + 1)) + minVal
 }
 
 const randomFromArray = (array) => {
@@ -102,6 +104,7 @@ const createUserData = () => {
   }
 }
 
+// eslint-disable-next-line
 const createPostData = (user) => {
   return {
     title: faker.lorem.words(),
@@ -113,9 +116,11 @@ const createPostData = (user) => {
 }
 
 // Create an initial set of users and posts
+// eslint-disable-next-line
 for (let i = 0; i < NUM_USERS; i++) {
   const author = db.user.create(createUserData())
 
+  // eslint-disable-next-line
   for (let j = 0; j < POSTS_PER_USER; j++) {
     const newPost = createPostData(author)
     db.post.create(newPost)
@@ -130,18 +135,18 @@ const serializePost = (post) => ({
 /* MSW REST API Handlers */
 
 export const handlers = [
-  rest.get('/fakeApi/posts', function (req, res, ctx) {
+  rest.get('/fakeApi/posts', (req, res, ctx) => {
     const posts = db.post.getAll().map(serializePost)
     return res(ctx.delay(ARTIFICIAL_DELAY_MS), ctx.json(posts))
   }),
-  rest.post('/fakeApi/posts', function (req, res, ctx) {
+  rest.post('/fakeApi/posts', (req, res, ctx) => {
     const data = req.body
 
     if (data.content === 'error') {
       return res(
         ctx.delay(ARTIFICIAL_DELAY_MS),
         ctx.status(500),
-        ctx.json('Server error saving this post!')
+        ctx.json('Server error saving this post!'),
       )
     }
 
@@ -154,7 +159,7 @@ export const handlers = [
     const post = db.post.create(data)
     return res(ctx.delay(ARTIFICIAL_DELAY_MS), ctx.json(serializePost(post)))
   }),
-  rest.get('/fakeApi/posts/:postId', function (req, res, ctx) {
+  rest.get('/fakeApi/posts/:postId', (req, res, ctx) => {
     const post = db.post.findFirst({
       where: { id: { equals: req.params.postId } },
     })
@@ -168,7 +173,7 @@ export const handlers = [
     })
     return res(
       ctx.delay(ARTIFICIAL_DELAY_MS),
-      ctx.json(serializePost(updatedPost))
+      ctx.json(serializePost(updatedPost)),
     )
   }),
 
@@ -178,13 +183,13 @@ export const handlers = [
     })
     return res(
       ctx.delay(ARTIFICIAL_DELAY_MS),
-      ctx.json({ comments: post.comments })
+      ctx.json({ comments: post.comments }),
     )
   }),
 
   rest.post('/fakeApi/posts/:postId/reactions', (req, res, ctx) => {
-    const postId = req.params.postId
-    const reaction = req.body.reaction
+    const { postId } = req.params
+    const { reaction } = req.body
     const post = db.post.findFirst({
       where: { id: { equals: postId } },
     })
@@ -201,27 +206,30 @@ export const handlers = [
 
     return res(
       ctx.delay(ARTIFICIAL_DELAY_MS),
-      ctx.json(serializePost(updatedPost))
+      ctx.json(serializePost(updatedPost)),
     )
   }),
   rest.get('/fakeApi/notifications', (req, res, ctx) => {
     const numNotifications = getRandomInt(1, 5)
 
+    // eslint-disable-next-line
     let notifications = generateRandomNotifications(
       undefined,
       numNotifications,
-      db
+      db,
     )
 
     return res(ctx.delay(ARTIFICIAL_DELAY_MS), ctx.json(notifications))
   }),
-  rest.get('/fakeApi/users', (req, res, ctx) => {
-    return res(ctx.delay(ARTIFICIAL_DELAY_MS), ctx.json(db.user.getAll()))
-  }),
+  rest.get(
+    '/fakeApi/users',
+    (req, res, ctx) => res(ctx.delay(ARTIFICIAL_DELAY_MS), ctx.json(db.user.getAll())),
+  ),
 ]
 
 export const worker = setupWorker(...handlers)
-// worker.printHandlers() // Optional: nice for debugging to see all available route handlers that will be intercepted
+// worker.printHandlers()
+// Optional: nice for debugging to see all available route handlers that will be intercepted
 
 /* Mock Websocket Setup */
 
@@ -238,6 +246,7 @@ const sendMessage = (socket, obj) => {
 const sendRandomNotifications = (socket, since) => {
   const numNotifications = getRandomInt(1, 5)
 
+  // eslint-disable-next-line
   const notifications = generateRandomNotifications(since, numNotifications, db)
 
   sendMessage(socket, { type: 'notifications', payload: notifications })
@@ -270,10 +279,11 @@ socketServer.on('connection', (socket) => {
 const notificationTemplates = [
   'poked you',
   'says hi!',
-  `is glad we're friends`,
+  "is glad we're friends",
   'sent you a gift',
 ]
 
+// eslint-disable-next-line
 function generateRandomNotifications(since, numNotifications, db) {
   const now = new Date()
   let pastDate

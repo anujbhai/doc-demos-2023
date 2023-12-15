@@ -6,7 +6,7 @@ import {
   nanoid,
 } from '@reduxjs/toolkit'
 
-import { client } from '../../api/client'
+import client from '../../api/client'
 
 const postsAdapter = createEntityAdapter({
   sortComparer: (a, b) => b.date.localeCompare(a.date),
@@ -41,6 +41,7 @@ const postsSlice = createSlice({
       const existingPost = state.entities[postId]
 
       if (existingPost) {
+        // eslint-disable-next-line
         existingPost.reactions[reaction]++
       }
     },
@@ -79,6 +80,7 @@ const postsSlice = createSlice({
   },
   extraReducers(builder) {
     builder
+      // eslint-disable-next-line
       .addCase(fetchPosts.pending, (state, action) => {
         const localState = state
         localState.status = 'loading'

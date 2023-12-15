@@ -1,18 +1,17 @@
-import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useState } from 'react'
+import { useSelector } from 'react-redux'
 
-import { addNewPost } from '../postsSlice'
 import { selectAllUsers } from '../../users/usersSlice'
+import { useAddNewPostMutation } from '../../../api/apiSlice'
 
 const AddPostForm = () => {
   // states
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [userId, setUserId] = useState('')
-  const [addRequestStatus, setAddRequestStatus] = useState('idle')
 
   // dispatch and selector
-  const dispatch = useDispatch()
+  const [addNewPost, { isLoading }] = useAddNewPostMutation()
   const users = useSelector(selectAllUsers)
 
   // events
@@ -20,20 +19,17 @@ const AddPostForm = () => {
   const handleContentChange = (e) => setContent(e.target.value)
   const handleAuthorChange = (e) => setUserId(e.target.value)
 
-  const canSave =
-    [title, content, userId].every(Boolean) && addRequestStatus === 'idle'
+  // eslint-disable-next-line
+  const canSave = [title, content, userId].every(Boolean) && !isLoading
   const handleSavePostClicked = async () => {
     if (canSave) {
       try {
-        setAddRequestStatus('pending')
-        await dispatch(addNewPost({ title, content, user: userId }))
+        await addNewPost({ title, content, user: userId }).unwrap()
         setTitle('')
         setContent('')
         setUserId('')
       } catch (err) {
         console.error('Failed to save the post: ', err)
-      } finally {
-        setAddRequestStatus('idle')
       }
 
       setTitle('')
@@ -52,28 +48,34 @@ const AddPostForm = () => {
       <h2>Add a new post</h2>
 
       <form>
-        <label htmlFor="postTitle">Post Title:</label>
-        <input
-          type="text"
-          id="postTitle"
-          name="postTitle"
-          value={title}
-          onChange={handleTitleChange}
-        />
+        <label htmlFor="postTitle">
+          <input
+            type="text"
+            id="postTitle"
+            name="postTitle"
+            value={title}
+            onChange={handleTitleChange}
+          />
+          Post Title:
+        </label>
 
-        <label htmlFor="postContent">Post Content:</label>
-        <textarea
-          id="postContent"
-          name="postContent"
-          value={content}
-          onChange={handleContentChange}
-        />
+        <label htmlFor="postContent">
+          <textarea
+            id="postContent"
+            name="postContent"
+            value={content}
+            onChange={handleContentChange}
+          />
+          Post Content:
+        </label>
 
-        <label htmlFor="postAuthor">Author:</label>
-        <select id="postAuthor" value={userId} onChange={handleAuthorChange}>
-          <option value="">-- SELECT --</option>
-          {usersOptions}
-        </select>
+        <label htmlFor="postAuthor">
+          <select id="postAuthor" value={userId} onChange={handleAuthorChange}>
+            <option value="">-- SELECT --</option>
+            {usersOptions}
+          </select>
+          Author:
+        </label>
 
         <button
           type="button"
