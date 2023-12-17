@@ -1,29 +1,23 @@
-import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
-import { postUpdated, selectPostById } from '../postsSlice'
+import { useGetPostQuery, useEditPostMutation } from '../../../api/apiSlice'
 
 const EditPostForm = () => {
   const { postId } = useParams()
-  const post = useSelector((state) => selectPostById(state, postId))
+  const { data: post } = useGetPostQuery(postId)
+  // eslint-disable-next-line
+  const [updatePost, { isLoading }] = useEditPostMutation()
   const [title, setTitle] = useState(post.title)
   const [content, setContent] = useState(post.content)
-  const dispatch = useDispatch()
   const navigate = useNavigate()
 
   const handleTitleChange = (e) => setTitle(e.target.value)
   const handleContentChange = (e) => setContent(e.target.value)
 
-  const handleSavePostClicked = () => {
+  const handleSavePostClicked = async () => {
     if (title && content) {
-      dispatch(
-        postUpdated({
-          id: postId,
-          title,
-          content,
-        })
-      )
+      await updatePost({ id: postId, title, content })
 
       navigate(`/posts/${postId}`)
     }
@@ -34,22 +28,26 @@ const EditPostForm = () => {
       <h2>Edit post</h2>
 
       <form>
-        <label htmlFor="postTitle">Post Title:</label>
-        <input
-          type="text"
-          id="postTitle"
-          name="postTitle"
-          value={title}
-          onChange={handleTitleChange}
-        />
+        <label htmlFor="postTitle">
+          <input
+            type="text"
+            id="postTitle"
+            name="postTitle"
+            value={title}
+            onChange={handleTitleChange}
+          />
+          Post Title:
+        </label>
 
-        <label htmlFor="postContent">Post Content:</label>
-        <textarea
-          id="postContent"
-          name="postContent"
-          value={content}
-          onChange={handleContentChange}
-        />
+        <label htmlFor="postContent">
+          <textarea
+            id="postContent"
+            name="postContent"
+            value={content}
+            onChange={handleContentChange}
+          />
+          Post Content:
+        </label>
 
         <button type="button" onClick={handleSavePostClicked}>
           Save
