@@ -1,5 +1,9 @@
-import { useDispatch } from "react-redux"
-import { reactionAdded } from "../postsSlice"
+import React from 'react'
+import PropTypes from 'prop-types'
+// import { useDispatch } from 'react-redux'
+
+// import { reactionAdded } from '../postsSlice'
+import { useAddReactionMutation } from '../../../api/apiSlice'
 
 const reactionEmoji = {
   thumbsUp: '👍',
@@ -9,25 +13,38 @@ const reactionEmoji = {
   eyes: '👀',
 }
 
-const ReactionButtons = props => {
+const ReactionButtons = (props) => {
   const { post } = props
-  const dispatch = useDispatch()
+  const [addReaction] = useAddReactionMutation()
+  // const dispatch = useDispatch()
 
-  const reactionButtons = Object.entries(reactionEmoji).map(([name, emoji]) => {
-    return (
+  const reactionButtons = Object.entries(reactionEmoji).map(
+    ([reactionName, emoji]) => (
       <button
-        key={ name }
+        key={reactionName}
         type="button"
         className="muted-button reaction-button"
-        onClick={ () => dispatch(reactionAdded({ postId: post.id, reaction: name })) }
+        onClick={() => addReaction({ postId: post.id, reaction: reactionName })}
       >
-        { emoji } { post.reactions[name] }
+        {emoji} {post.reactions[reactionName]} {/* eslint-disable-line */}
       </button>
-    )
-  })
+    ),
+  )
 
-  return <div>{ reactionButtons }</div>
+  return <div>{reactionButtons}</div>
+}
+
+ReactionButtons.propTypes = {
+  post: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    reactions: PropTypes.shape({
+      thumbsUp: PropTypes.number.isRequired,
+      hooray: PropTypes.number.isRequired,
+      heart: PropTypes.number.isRequired,
+      rocket: PropTypes.number.isRequired,
+      eyes: PropTypes.number.isRequired,
+    }).isRequired,
+  }).isRequired,
 }
 
 export default ReactionButtons
-

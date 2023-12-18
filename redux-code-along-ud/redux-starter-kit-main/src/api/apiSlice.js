@@ -36,6 +36,32 @@ export const apiSlice = createApi({
     getUsers: builder.query({
       query: () => '/users',
     }),
+    addReaction: builder.mutation({
+      query: ({ postId, reaction }) => ({
+        url: `/posts/${postId}/reactions`,
+        method: 'POST',
+        body: { reaction },
+      }),
+      async onQueryStarted({ postId, reaction }, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          apiSlice.util.updateQueryData('getPosts', undefined, (draft) => {
+            const post = draft.find((post) => post.id === postId) // eslint-disable-line
+
+            if (post) {
+              post.reactions[reaction]++ // eslint-disable-line
+            }
+          }),
+        )
+        try {
+          await queryFulfilled // wait for the mutation to finish
+        } catch {
+          patchResult.undo() // revert the optimistic update
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        { type: 'Post', id: arg.postId },
+      ],
+    }),
   }),
 })
 
@@ -46,4 +72,5 @@ export const {
   useAddNewPostMutation,
   useEditPostMutation,
   useGetUsersQuery,
+  useAddReactionMutation,
 } = apiSlice

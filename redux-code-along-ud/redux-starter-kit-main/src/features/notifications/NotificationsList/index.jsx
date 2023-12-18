@@ -5,13 +5,15 @@ import classNames from 'classnames'
 
 import {
   allNotificationsRead,
-  selectAllNotifications,
+  selectMetadataEntities,
+  useGetNotificationsQuery,
 } from '../notificationsSlice'
 import { selectAllUsers } from '../../users/usersSlice'
 
 const NotificationsList = () => {
   const dispatch = useDispatch()
-  const notifications = useSelector(selectAllNotifications)
+  const { data: notifications = [] } = useGetNotificationsQuery()
+  const notificationsMetadata = useSelector(selectMetadataEntities)
   const users = useSelector(selectAllUsers)
 
   useLayoutEffect(() => {
@@ -25,8 +27,11 @@ const NotificationsList = () => {
     const user = users.find((user) => user.id === notification.user) || {
       name: 'Unknown user',
     }
+
+    const metaData = notificationsMetadata[notification.id]
+
     const notificationsClassName = classNames('notification', {
-      new: notification.isNew,
+      new: metaData.isNew,
     })
 
     return (
