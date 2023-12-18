@@ -6,7 +6,7 @@ import {
   Routes,
 } from 'react-router-dom'
 
-import { Navbar } from './app/Navbar'
+import Navbar from './app/Navbar'
 import PostsList from './features/posts/PostsList'
 import AddPostForm from './features/posts/AddPostForm'
 import SinglePostPage from './features/posts/SinglePostPage'
@@ -22,12 +22,12 @@ const App = () => (
       <Routes>
         <Route
           path="/"
-          element={(
+          element={
             <>
               <AddPostForm />
               <PostsList />
             </>
-          )}
+          }
         />
         <Route path="/posts/:postId" element={<SinglePostPage />} />
         <Route path="/editPost/:postId" element={<EditPostForm />} />
