@@ -29,7 +29,7 @@ export const extendedApi = apiSlice.injectEndpoints({
             const message = JSON.parse(event.data)
 
             switch (message.type) {
-              case 'notificatiions': {
+              case 'notifications': {
                 updateCachedData((draft) => {
                   draft.push(...message.payload)
                   draft.sort((a, b) => b.date.localeCompare(a.date))
@@ -117,5 +117,5 @@ export default notificationsSlice.reducer
 
 export const {
   selectAll: selectNotificationsMetadata,
-  selectById: selectMetadataEntities,
+  selectEntities: selectMetadataEntities,
 } = notificationsAdapter.getSelectors((state) => state.notifications)
